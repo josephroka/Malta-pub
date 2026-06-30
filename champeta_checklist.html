@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champeta Bar — Malta</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #1a1a1a;
+    --border: #2a2a2a;
+    --green: #39ff14;
+    --pink: #ff2d78;
+    --yellow: #ffe600;
+    --purple: #a78bfa;
+    --text: #e8e8e8;
+    --muted: #666;
+    --done-bg: #0e2210;
+  }
+
+  /* PASSWORD SCREEN */
+  #lockScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 32px;
+  }
+
+  #lockScreen.hidden { display: none; }
+
+  .lock-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(57,255,20,0.4);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .lock-logo span { color: var(--pink); text-shadow: 0 0 20px rgba(255,45,120,0.4); }
+
+  .lock-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    margin-bottom: 36px;
+    letter-spacing: 0.5px;
+  }
+
+  .lock-icon {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  #passwordInput {
+    width: 100%;
+    max-width: 280px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    padding: 13px 16px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 3px;
+    transition: border-color 0.2s;
+  }
+
+  #passwordInput:focus { border-color: var(--green); }
+  #passwordInput.error { border-color: var(--pink); animation: shake 0.3s ease; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  #lockBtn {
+    margin-top: 14px;
+    width: 100%;
+    max-width: 280px;
+    background: var(--green);
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    border: none;
+    border-radius: 8px;
+    padding: 13px;
+    cursor: pointer;
+    box-shadow: 0 0 16px rgba(57,255,20,0.3);
+    transition: opacity 0.2s;
+  }
+
+  #lockBtn:active { opacity: 0.8; }
+
+  #lockError {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--pink);
+    min-height: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 32px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-shadow: 0 0 18px rgba(57,255,20,0.35);
+    line-height: 1;
+  }
+
+  .logo span { color: var(--pink); text-shadow: 0 0 18px rgba(255,45,120,0.35); }
+
+  .subtitle { color: var(--muted); font-size: 12px; margin-top: 5px; }
+
+  .bar-wrap {
+    margin-top: 16px;
+    background: var(--border);
+    border-radius: 4px;
+    height: 5px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--yellow));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 6px rgba(57,255,20,0.5);
+    width: 0%;
+  }
+
+  .bar-label { font-size: 11px; color: var(--muted); margin-top: 5px; }
+  .bar-label strong { color: var(--green); }
+
+  main { padding: 20px 16px 40px; max-width: 660px; margin: 0 auto; }
+
+  .phase { margin-bottom: 28px; }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .tag {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .tag.docs { background: rgba(255,230,0,0.12); color: var(--yellow); border: 1px solid rgba(255,230,0,0.25); }
+  .tag.locals { background: rgba(57,255,20,0.08); color: var(--green); border: 1px solid rgba(57,255,20,0.2); }
+  .tag.people { background: rgba(255,45,120,0.1); color: var(--pink); border: 1px solid rgba(255,45,120,0.2); }
+  .tag.visit { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+  .tag.post { background: rgba(255,120,0,0.1); color: #fb923c; border: 1px solid rgba(255,120,0,0.2); }
+  .tag.open { background: rgba(57,255,20,0.08); color: var(--green); border: 1px solid rgba(57,255,20,0.2); }
+
+  .phase-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 19px;
+    letter-spacing: 1px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin-bottom: 10px; }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 14px 0 7px 3px;
+  }
+
+  /* TASK */
+  .task {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    margin-bottom: 7px;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: border-color 0.2s, background 0.2s;
+    overflow: hidden;
+  }
+
+  .task-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 13px;
+    cursor: pointer;
+  }
+
+  .task:hover { border-color: #3a3a3a; }
+
+  .task.done { background: var(--done-bg); border-color: rgba(57,255,20,0.18); }
+  .task.done .task-text { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(57,255,20,0.35); }
+  .task.done .task-hint { color: #3a3a3a; }
+
+  .cb {
+    width: 19px; height: 19px;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .task.done .cb {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 6px rgba(57,255,20,0.4);
+  }
+
+  .ck { display: none; width: 10px; height: 7px; }
+  .ck path { stroke: #000; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .task.done .ck { display: block; }
+
+  .task-body { flex: 1; min-width: 0; }
+  .task-text { font-size: 14px; font-weight: 500; line-height: 1.4; }
+  .task-hint { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+  .cost {
+    font-size: 11px; font-weight: 600;
+    color: var(--yellow);
+    background: rgba(255,230,0,0.07);
+    border: 1px solid rgba(255,230,0,0.18);
+    border-radius: 4px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  /* TASK NOTE */
+  .task-note-area {
+    display: none;
+    padding: 0 13px 12px 44px;
+  }
+
+  .task-note-area.open { display: block; }
+
+  .task-note-area textarea {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 10px;
+    resize: none;
+    outline: none;
+    min-height: 60px;
+  }
+
+  .task-note-area textarea::placeholder { color: #444; }
+
+  .note-toggle-btn {
+    margin-top: 5px;
+    font-size: 11px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .note-toggle-btn:hover { color: var(--yellow); }
+
+  .has-note-dot {
+    display: none;
+    width: 6px; height: 6px;
+    background: var(--yellow);
+    border-radius: 50%;
+    flex-shrink: 0;
+    align-self: center;
+    box-shadow: 0 0 5px rgba(255,230,0,0.5);
+  }
+
+  .has-note-dot.visible { display: block; }
+
+  /* PRESS HINT */
+  .press-hint {
+    font-size: 11px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+  }
+
+  /* FILES */
+  .files-section {
+    margin-top: 28px;
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .files-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 19px;
+    color: var(--pink);
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255,45,120,0.25);
+  }
+
+  .files-sub { font-size: 11px; color: var(--muted); margin-top: 3px; margin-bottom: 14px; }
+
+  .file-cat-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 12px 0 6px;
+  }
+
+  .file-slot {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 11px;
+    border-radius: 6px;
+    border: 1px dashed var(--border);
+    margin-bottom: 5px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .file-slot:hover { border-color: #444; }
+  .file-slot.filled { border-style: solid; border-color: rgba(57,255,20,0.25); background: #0a1a0a; }
+
+  .file-icon { font-size: 15px; flex-shrink: 0; }
+  .file-label { font-size: 13px; flex: 1; }
+  .file-slot.filled .file-label { color: var(--green); }
+  .file-status { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+  .file-slot.filled .file-status { color: rgba(57,255,20,0.55); }
+
+  input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  /* GLOBAL NOTES */
+  .global-notes {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,230,0,0.18);
+    background: rgba(255,230,0,0.03);
+  }
+
+  .global-notes-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: var(--yellow);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .global-notes textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    resize: vertical;
+    outline: none;
+    min-height: 70px;
+    line-height: 1.6;
+  }
+
+  .global-notes textarea::placeholder { color: #3a3a3a; }
+
+  footer { text-align: center; padding: 20px; font-size: 11px; color: #2a2a2a; }
+
+  /* LONG PRESS RIPPLE */
+  .task-main.pressing { opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-icon">🔐</div>
+  <div class="lock-logo">Champeta <span>Bar</span></div>
+  <div class="lock-sub">Malta Business Roadmap</div>
+  <input type="password" id="passwordInput" placeholder="Contraseña" onkeydown="if(event.key==='Enter')unlock()">
+  <button id="lockBtn" onclick="unlock()">ENTRAR</button>
+  <div id="lockError"></div>
+</div>
+
+<header>
+  <div class="logo">Champeta <span>Bar</span> — Malta</div>
+  <div class="subtitle">Joseph & Santiago · Roadmap 2025</div>
+  <div class="bar-wrap"><div class="bar-fill" id="barFill"></div></div>
+  <div class="bar-label" id="barLabel"><strong>0</strong> de <strong>0</strong> tareas</div>
+</header>
+
+<main>
+
+<div class="press-hint">Mantén pulsada cualquier tarea para añadir una nota 📝</div>
+
+<!-- ─── FASE 1: DOCUMENTOS ─── -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="tag docs">Paso 1</span>
+    <span class="phase-title">Documentos — Joseph y Santiago</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section-label">Joseph</div>
+
+  <div class="task" id="t1">
+    <div class="task-main" onclick="tap('t1')" onmousedown="startPress('t1')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t1')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Fotocopia del pasaporte español</div>
+        <div class="task-hint">Llevar varias copias físicas al viaje.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t1"></div>
+    </div>
+    <div class="task-note-area" id="note-t1">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t1', this.value)" onblur="checkNoteDot('t1', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t2">
+    <div class="task-main" onclick="tap('t2')" onmousedown="startPress('t2')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t2')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Prueba de domicilio actual</div>
+        <div class="task-hint">Factura bancaria o carta oficial reciente.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t2"></div>
+    </div>
+    <div class="task-note-area" id="note-t2">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t2', this.value)" onblur="checkNoteDot('t2', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t3">
+    <div class="task-main" onclick="tap('t3')" onmousedown="startPress('t3')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t3')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Pedir certificado de antecedentes penales</div>
+        <div class="task-hint">Online en el Ministerio de Justicia España. Puede tardar varios días — pídelo ya.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t3"></div>
+      <div class="cost">€3–10</div>
+    </div>
+    <div class="task-note-area" id="note-t3">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t3', this.value)" onblur="checkNoteDot('t3', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="section-label">Santiago</div>
+
+  <div class="task" id="t4">
+    <div class="task-main" onclick="tap('t4')" onmousedown="startPress('t4')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t4')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Fotocopia del pasaporte (Santiago)</div>
+        <div class="task-hint">Para el registro de la empresa y la licencia MTA.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t4"></div>
+    </div>
+    <div class="task-note-area" id="note-t4">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t4', this.value)" onblur="checkNoteDot('t4', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t5">
+    <div class="task-main" onclick="tap('t5')" onmousedown="startPress('t5')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t5')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Antecedentes penales (Santiago)</div>
+        <div class="task-hint">Necesarios para la licencia MTA. Que los pida ya.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t5"></div>
+    </div>
+    <div class="task-note-area" id="note-t5">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t5', this.value)" onblur="checkNoteDot('t5', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t6">
+    <div class="task-main" onclick="tap('t6')" onmousedown="startPress('t6')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t6')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Prueba de domicilio de Santiago en Malta</div>
+        <div class="task-hint">Contrato de alquiler o factura a su nombre. Será el domicilio social provisional de la empresa.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t6"></div>
+    </div>
+    <div class="task-note-area" id="note-t6">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t6', this.value)" onblur="checkNoteDot('t6', this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FASE 2: LOCALES ─── -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="tag locals">Paso 2</span>
+    <span class="phase-title">Lista de locales potenciales</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="task" id="t7">
+    <div class="task-main" onclick="tap('t7')" onmousedown="startPress('t7')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t7')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Santiago busca mínimo 3–4 locales</div>
+        <div class="task-hint">Dirección, precio mensual, tamaño y qué había antes en cada uno.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t7"></div>
+    </div>
+    <div class="task-note-area" id="note-t7">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t7', this.value)" onblur="checkNoteDot('t7', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t8">
+    <div class="task-main" onclick="tap('t8')" onmousedown="startPress('t8')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t8')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Confirmar que cada local permite uso como bar</div>
+        <div class="task-hint">Preguntar al casero qué había antes. Si era otra cosa, puede necesitar permiso de cambio de uso.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t8"></div>
+    </div>
+    <div class="task-note-area" id="note-t8">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t8', this.value)" onblur="checkNoteDot('t8', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t9">
+    <div class="task-main" onclick="tap('t9')" onmousedown="startPress('t9')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t9')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Conseguir plano de cada local candidato</div>
+        <div class="task-hint">Necesario para la solicitud de licencia MTA y para que el arquitecto pueda valorar.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t9"></div>
+    </div>
+    <div class="task-note-area" id="note-t9">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t9', this.value)" onblur="checkNoteDot('t9', this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FASE 3: GENTE CLAVE ─── -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="tag people">Paso 3</span>
+    <span class="phase-title">Conseguir la gente clave ahora</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section-label">El gestor / contable</div>
+
+  <div class="task" id="t10">
+    <div class="task-main" onclick="tap('t10')" onmousedown="startPress('t10')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t10')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Santiago confirma el gestor y sus honorarios</div>
+        <div class="task-hint">¿Cuánto cobra por registrar la empresa + gestionar la licencia MTA? Que lo confirme ya.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t10"></div>
+    </div>
+    <div class="task-note-area" id="note-t10">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t10', this.value)" onblur="checkNoteDot('t10', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t11">
+    <div class="task-main" onclick="tap('t11')" onmousedown="startPress('t11')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t11')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Confirmar reunión con el gestor para el 26/27 julio</div>
+        <div class="task-hint">Que esté disponible durante la visita para arrancar el papeleo en persona.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t11"></div>
+    </div>
+    <div class="task-note-area" id="note-t11">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t11', this.value)" onblur="checkNoteDot('t11', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t12">
+    <div class="task-main" onclick="tap('t12')" onmousedown="startPress('t12')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t12')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">El gestor empieza el papeleo de la empresa (Ltd)</div>
+        <div class="task-hint">Puede arrancar con documentos enviados por email antes de la visita si es posible.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t12"></div>
+      <div class="cost">€400–800</div>
+    </div>
+    <div class="task-note-area" id="note-t12">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t12', this.value)" onblur="checkNoteDot('t12', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="section-label">El arquitecto</div>
+
+  <div class="task" id="t13">
+    <div class="task-main" onclick="tap('t13')" onmousedown="startPress('t13')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t13')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Santiago busca un arquitecto disponible para julio</div>
+        <div class="task-hint">Que pueda visitar los locales de la lista con vosotros durante el 26/27.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t13"></div>
+    </div>
+    <div class="task-note-area" id="note-t13">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t13', this.value)" onblur="checkNoteDot('t13', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t14">
+    <div class="task-main" onclick="tap('t14')" onmousedown="startPress('t14')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t14')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Visitar los mejores locales con el arquitecto</div>
+        <div class="task-hint">El arquitecto confirma si necesita reformas, si ya es apto para bar, y hace la declaración para la MTA.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t14"></div>
+      <div class="cost">€200–500</div>
+    </div>
+    <div class="task-note-area" id="note-t14">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t14', this.value)" onblur="checkNoteDot('t14', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="section-label">El proveedor de alcohol</div>
+
+  <div class="task" id="t15">
+    <div class="task-main" onclick="tap('t15')" onmousedown="startPress('t15')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t15')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Reunión con el proveedor de alcohol</div>
+        <div class="task-hint">Ver lista de precios. Confirmar por escrito el acuerdo de consignación — pagar solo lo que se vende.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t15"></div>
+    </div>
+    <div class="task-note-area" id="note-t15">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t15', this.value)" onblur="checkNoteDot('t15', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="section-label">El promotor</div>
+
+  <div class="task" id="t16">
+    <div class="task-main" onclick="tap('t16')" onmousedown="startPress('t16')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t16')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Reunión con el promotor de eventos</div>
+        <div class="task-hint">Aclarar si trabaja por porcentaje o pago fijo, y qué eventos puede traer desde el principio.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t16"></div>
+    </div>
+    <div class="task-note-area" id="note-t16">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t16', this.value)" onblur="checkNoteDot('t16', this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FASE 4: VISITA JULIO ─── -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="tag visit">Paso 4</span>
+    <span class="phase-title">Durante la visita — 26/27 Julio</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="task" id="t17">
+    <div class="task-main" onclick="tap('t17')" onmousedown="startPress('t17')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t17')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Firmar acuerdo de socios con Santiago</div>
+        <div class="task-hint">Porcentajes, reparto de beneficios, qué pasa si uno quiere salir. Antes de mover dinero.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t17"></div>
+    </div>
+    <div class="task-note-area" id="note-t17">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t17', this.value)" onblur="checkNoteDot('t17', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t18">
+    <div class="task-main" onclick="tap('t18')" onmousedown="startPress('t18')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t18')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Reunión con el gestor — arrancar empresa y licencia</div>
+        <div class="task-hint">Confirmar honorarios totales y firmar lo necesario para iniciar el proceso.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t18"></div>
+      <div class="cost">€300–500</div>
+    </div>
+    <div class="task-note-area" id="note-t18">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t18', this.value)" onblur="checkNoteDot('t18', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t19">
+    <div class="task-main" onclick="tap('t19')" onmousedown="startPress('t19')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t19')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Negociar precio del local elegido con el casero</div>
+        <div class="task-hint">Explicar que se firma en invierno — el casero estará más flexible entonces.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t19"></div>
+    </div>
+    <div class="task-note-area" id="note-t19">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t19', this.value)" onblur="checkNoteDot('t19', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t20">
+    <div class="task-main" onclick="tap('t20')" onmousedown="startPress('t20')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t20')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Salir de Malta con todo confirmado</div>
+        <div class="task-hint">Acuerdo firmado ✓ · Gestor arrancado ✓ · Local elegido ✓ · Proveedor confirmado ✓</div>
+      </div>
+      <div class="has-note-dot" id="dot-t20"></div>
+    </div>
+    <div class="task-note-area" id="note-t20">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t20', this.value)" onblur="checkNoteDot('t20', this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FASE 5: POST VERANO ─── -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="tag post">Paso 5</span>
+    <span class="phase-title">Post verano — inversión fuerte</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="task" id="t21">
+    <div class="task-main" onclick="tap('t21')" onmousedown="startPress('t21')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t21')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Firmar contrato de alquiler del local</div>
+      </div>
+      <div class="has-note-dot" id="dot-t21"></div>
+      <div class="cost">€1.000–2.000</div>
+    </div>
+    <div class="task-note-area" id="note-t21">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t21', this.value)" onblur="checkNoteDot('t21', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t22">
+    <div class="task-main" onclick="tap('t22')" onmousedown="startPress('t22')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t22')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Alquilar piso para vivir con Santiago</div>
+        <div class="task-hint">Cambiar el domicilio social de la empresa a esta dirección.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t22"></div>
+      <div class="cost">€800–1.500</div>
+    </div>
+    <div class="task-note-area" id="note-t22">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t22', this.value)" onblur="checkNoteDot('t22', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t23">
+    <div class="task-main" onclick="tap('t23')" onmousedown="startPress('t23')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t23')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Pedir decoración y muebles por Taobao</div>
+        <div class="task-hint">Sillas, taburetes, mesas, plantas, decoración tropical. Pedir con 4–6 semanas de antelación.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t23"></div>
+      <div class="cost">€600–1.200</div>
+    </div>
+    <div class="task-note-area" id="note-t23">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t23', this.value)" onblur="checkNoteDot('t23', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t24">
+    <div class="task-main" onclick="tap('t24')" onmousedown="startPress('t24')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t24')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Pedir letreros de neón personalizados (Taobao)</div>
+        <div class="task-hint">3–4 letreros con frases del concepto. En Europa costarían €300+ cada uno. En Taobao €30–80.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t24"></div>
+      <div class="cost">€100–250</div>
+    </div>
+    <div class="task-note-area" id="note-t24">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t24', this.value)" onblur="checkNoteDot('t24', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t25">
+    <div class="task-main" onclick="tap('t25')" onmousedown="startPress('t25')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t25')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Instalar sistema de sonido</div>
+        <div class="task-hint">Fundamental para el concepto champeta/fiesta.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t25"></div>
+      <div class="cost">€500–1.000</div>
+    </div>
+    <div class="task-note-area" id="note-t25">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t25', this.value)" onblur="checkNoteDot('t25', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t26">
+    <div class="task-main" onclick="tap('t26')" onmousedown="startPress('t26')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t26')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Montar barra e instalar neveras</div>
+      </div>
+      <div class="has-note-dot" id="dot-t26"></div>
+      <div class="cost">€500–1.000</div>
+    </div>
+    <div class="task-note-area" id="note-t26">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t26', this.value)" onblur="checkNoteDot('t26', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t27">
+    <div class="task-main" onclick="tap('t27')" onmousedown="startPress('t27')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t27')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Permisos finales — música, sanidad, seguridad</div>
+      </div>
+      <div class="has-note-dot" id="dot-t27"></div>
+      <div class="cost">€350–700</div>
+    </div>
+    <div class="task-note-area" id="note-t27">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t27', this.value)" onblur="checkNoteDot('t27', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t28">
+    <div class="task-main" onclick="tap('t28')" onmousedown="startPress('t28')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t28')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Primer pedido de alcohol al proveedor</div>
+        <div class="task-hint">Solo pagáis lo que vendáis con el acuerdo de consignación.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t28"></div>
+      <div class="cost">€500–1.000</div>
+    </div>
+    <div class="task-note-area" id="note-t28">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t28', this.value)" onblur="checkNoteDot('t28', this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FASE 6: APERTURA ─── -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="tag open">Paso 6</span>
+    <span class="phase-title">Apertura — invierno</span>
+  </div>
+  <div class="divider"></div>
+
+  <div class="task" id="t29">
+    <div class="task-main" onclick="tap('t29')" onmousedown="startPress('t29')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t29')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Redes sociales activas antes de abrir</div>
+        <div class="task-hint">Instagram mínimo. Crear expectativa en la comunidad latina de Malta.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t29"></div>
+    </div>
+    <div class="task-note-area" id="note-t29">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t29', this.value)" onblur="checkNoteDot('t29', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t30">
+    <div class="task-main" onclick="tap('t30')" onmousedown="startPress('t30')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t30')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">Soft opening con el promotor</div>
+        <div class="task-hint">Evento de lanzamiento con su lista. Probar todo antes del verano grande.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t30"></div>
+    </div>
+    <div class="task-note-area" id="note-t30">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t30', this.value)" onblur="checkNoteDot('t30', this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="task" id="t31">
+    <div class="task-main" onclick="tap('t31')" onmousedown="startPress('t31')" onmouseup="endPress()" onmouseleave="endPress()" ontouchstart="startPress('t31')" ontouchend="endPress()">
+      <div class="cb"><svg class="ck" viewBox="0 0 10 7"><path d="M1 3.5l2.5 2.5 5.5-5.5"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">🎉 Apertura oficial del Champeta Bar</div>
+        <div class="task-hint">Con todas las licencias en regla. Listos para el verano siguiente.</div>
+      </div>
+      <div class="has-note-dot" id="dot-t31"></div>
+    </div>
+    <div class="task-note-area" id="note-t31">
+      <textarea placeholder="Añade una nota..." oninput="saveNote('t31', this.value)" onblur="checkNoteDot('t31', this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- FILES -->
+<div class="files-section">
+  <div class="files-title">📁 Archivo de documentos</div>
+  <div class="files-sub">Toca para subir. Los archivos se guardan solo en tu dispositivo.</div>
+
+  <div class="file-cat-label">Identidad y antecedentes</div>
+  <div class="file-slot" id="fs1"><span class="file-icon">🛂</span><span class="file-label">Pasaporte Joseph</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs1')"></div>
+  <div class="file-slot" id="fs2"><span class="file-icon">🛂</span><span class="file-label">Pasaporte Santiago</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs2')"></div>
+  <div class="file-slot" id="fs3"><span class="file-icon">📋</span><span class="file-label">Antecedentes penales Joseph</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs3')"></div>
+  <div class="file-slot" id="fs4"><span class="file-icon">📋</span><span class="file-label">Antecedentes penales Santiago</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs4')"></div>
+
+  <div class="file-cat-label">Empresa y acuerdos</div>
+  <div class="file-slot" id="fs5"><span class="file-icon">🤝</span><span class="file-label">Acuerdo de socios</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs5')"></div>
+  <div class="file-slot" id="fs6"><span class="file-icon">🏢</span><span class="file-label">Registro empresa (Ltd Malta)</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs6')"></div>
+  <div class="file-slot" id="fs7"><span class="file-icon">🍾</span><span class="file-label">Acuerdo consignación alcohol</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs7')"></div>
+
+  <div class="file-cat-label">Licencias</div>
+  <div class="file-slot" id="fs8"><span class="file-icon">📄</span><span class="file-label">Licencia catering MTA</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs8')"></div>
+  <div class="file-slot" id="fs9"><span class="file-icon">🍹</span><span class="file-label">Licencia de alcohol</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs9')"></div>
+  <div class="file-slot" id="fs10"><span class="file-icon">🎵</span><span class="file-label">Permiso música amplificada</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs10')"></div>
+
+  <div class="file-cat-label">Local</div>
+  <div class="file-slot" id="fs11"><span class="file-icon">📐</span><span class="file-label">Plano del local</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs11')"></div>
+  <div class="file-slot" id="fs12"><span class="file-icon">🔑</span><span class="file-label">Contrato alquiler del local</span><span class="file-status">Sin subir</span><input type="file" onchange="fileUp(this,'fs12')"></div>
+</div>
+
+<!-- GLOBAL NOTES -->
+<div class="global-notes">
+  <div class="global-notes-title">📝 Notas generales</div>
+  <textarea id="globalNotes" placeholder="Preguntas para el gestor, ideas para el local, cosas que no olvidar..." oninput="saveGlobalNotes()"></textarea>
+</div>
+
+</main>
+<footer>Champeta Bar Malta · Joseph & Santiago 2025</footer>
+
+<script>
+  const PASSWORD = 'sjsj';
+
+  function unlock() {
+    const input = document.getElementById('passwordInput');
+    if (input.value === PASSWORD) {
+      document.getElementById('lockScreen').classList.add('hidden');
+      sessionStorage.setItem('unlocked', '1');
+    } else {
+      input.classList.add('error');
+      document.getElementById('lockError').textContent = 'Contraseña incorrecta';
+      input.value = '';
+      setTimeout(() => input.classList.remove('error'), 400);
+    }
+  }
+
+  if (sessionStorage.getItem('unlocked') === '1') {
+    document.getElementById('lockScreen').classList.add('hidden');
+  }
+
+  
+  let pressTarget = null;
+
+  function startPress(id) {
+    pressTarget = id;
+    pressTimer = setTimeout(() => {
+      openNote(id);
+      pressTimer = null;
+    }, 500);
+  }
+
+  function endPress() {
+    if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+  }
+
+  function tap(id) {
+    if (pressTimer === null && pressTarget === id) return; // long press handled
+    toggle(id);
+  }
+
+  function toggle(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('done');
+    updateProgress();
+    saveState();
+  }
+
+  function openNote(id) {
+    const area = document.getElementById('note-' + id);
+    area.classList.toggle('open');
+    if (area.classList.contains('open')) {
+      area.querySelector('textarea').focus();
+    }
+  }
+
+  function saveNote(id, val) {
+    const notes = JSON.parse(localStorage.getItem('champeta_notes') || '{}');
+    notes[id] = val;
+    localStorage.setItem('champeta_notes', JSON.stringify(notes));
+    checkNoteDot(id, val);
+  }
+
+  function checkNoteDot(id, val) {
+    const dot = document.getElementById('dot-' + id);
+    if (!dot) return;
+    if (val && val.trim().length > 0) dot.classList.add('visible');
+    else dot.classList.remove('visible');
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.task');
+    const done = document.querySelectorAll('.task.done');
+    const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+    document.getElementById('barFill').style.width = pct + '%';
+    document.getElementById('barLabel').innerHTML =
+      '<strong>' + done.length + '</strong> de <strong>' + all.length + '</strong> tareas completadas';
+  }
+
+  function saveState() {
+    const tasks = document.querySelectorAll('.task');
+    const state = Array.from(tasks).map(t => ({ id: t.id, done: t.classList.contains('done') }));
+    localStorage.setItem('champeta_state', JSON.stringify(state));
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem('champeta_state');
+    if (saved) {
+      JSON.parse(saved).forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el && s.done) el.classList.add('done');
+      });
+    }
+    const notes = JSON.parse(localStorage.getItem('champeta_notes') || '{}');
+    Object.entries(notes).forEach(([id, val]) => {
+      const area = document.getElementById('note-' + id);
+      if (area) {
+        area.querySelector('textarea').value = val;
+        checkNoteDot(id, val);
+      }
+    });
+    const gn = localStorage.getItem('champeta_global_notes');
+    if (gn) document.getElementById('globalNotes').value = gn;
+  }
+
+  function saveGlobalNotes() {
+    localStorage.setItem('champeta_global_notes', document.getElementById('globalNotes').value);
+  }
+
+  function fileUp(input, slotId) {
+    if (!input.files.length) return;
+    const slot = document.getElementById(slotId);
+    slot.classList.add('filled');
+    slot.querySelector('.file-status').textContent = '✓ ' + input.files[0].name;
+  }
+
+  loadState();
+  updateProgress();
+</script>
+</body>
+</html>
