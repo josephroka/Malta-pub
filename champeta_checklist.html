@@ -373,7 +373,16 @@
   .file-status { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
   .file-slot.filled .file-status { color: rgba(57,255,20,0.55); }
 
-  input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    -webkit-appearance: none;
+  }
 
   /* GLOBAL NOTES */
   .global-notes {
@@ -1002,12 +1011,15 @@
 
   
   let pressTarget = null;
+  let pressFired = false;
+  let pressTimer = null;
 
   function startPress(id) {
     pressTarget = id;
+    pressFired = false;
     pressTimer = setTimeout(() => {
+      pressFired = true;
       openNote(id);
-      pressTimer = null;
     }, 500);
   }
 
@@ -1016,7 +1028,7 @@
   }
 
   function tap(id) {
-    if (pressTimer === null && pressTarget === id) return; // long press handled
+    if (pressFired) { pressFired = false; return; }
     toggle(id);
   }
 
